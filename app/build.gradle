@@ -13,7 +13,7 @@ def keystorePSW = ''
 def keystoreAlias = ''
 def keystoreAliasPSW = ''
 // default keystore file, PLZ config file path in local.properties
-def keyfile = file('s.keystore.temp')
+def keyfile = file('/Users/asd/KeyPath/keystore')
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 def keystoreFilepath = properties.getProperty("keystore.path")
@@ -161,7 +161,7 @@ dependencies {
 
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.25', classifier: 'android'
 
-    implementation 'me.rosuh:AndroidFilePicker:0.4.2'
+    implementation 'me.rosuh:AndroidFilePicker:0.6.0'
 
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.45-androidx"
 
@@ -222,7 +222,7 @@ android.applicationVariants.all { variant ->
             customAbi = output.getFilter(com.android.build.OutputFile.ABI)
         }
         //output.outputFileName = fileName
-        def fileName = "ClashA-${customAbi}-${getCurrentFlavor()}-${output.apkData.versionName}.apk"
+        def fileName = "ClashAR-${customAbi}-${getCurrentFlavor()}-${output.apkData.versionName}.apk"
         output.outputFileName = fileName
     }
 }

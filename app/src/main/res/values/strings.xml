@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ClashA</string>
+    <string name="app_name">ClashAR</string>
     <string name="quick_toggle">Toggle</string>
     <string name="speed">%s/s</string>
     <string name="stat_summary">Sent: \t\t\t\t\t%3$s\t↑\t%1$s\nReceived: \t%4$s\t↓\t%2$s</string>

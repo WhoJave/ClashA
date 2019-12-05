@@ -4,10 +4,10 @@ function try () {
 "$@" || exit -1
 }
 
-[ -z "$ANDROID_NDK_HOME" ] && ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
+[ -z "$ANDROID_NDK_HOME" ] && ANDROID_NDK_HOME=~/Library/Android/android-ndk-r20
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-MIN_API=$1
+MIN_API=21
 TARGET=$DIR/bin
 DEPS=$DIR/.deps
 
