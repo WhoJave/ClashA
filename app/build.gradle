@@ -9,9 +9,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-def keystorePSW = ''
-def keystoreAlias = ''
-def keystoreAliasPSW = ''
+def keystorePSW = 'OnePiece'
+def keystoreAlias = 'OnePiece'
+def keystoreAliasPSW = 'OnePiece'
 // default keystore file, PLZ config file path in local.properties
 def keyfile = file('/Users/asd/KeyPath/keystore')
 Properties properties = new Properties()
@@ -37,7 +37,7 @@ android {
     buildToolsVersion rootProject.buildToolsVersion
     compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
-        applicationId "com.github.ccg.clasha"
+        applicationId "com.github.ccg.clashar"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.sdkVersion
         versionCode 17
