@@ -41,7 +41,7 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.sdkVersion
         versionCode 17
-        versionName "0.0.3.6"
+        versionName "0.0.3.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -161,7 +161,7 @@ dependencies {
 
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.25', classifier: 'android'
 
-    implementation 'me.rosuh:AndroidFilePicker:0.4.2'
+    implementation 'me.rosuh:AndroidFilePicker:0.6.0'
 
     implementation "com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.45-androidx"
 

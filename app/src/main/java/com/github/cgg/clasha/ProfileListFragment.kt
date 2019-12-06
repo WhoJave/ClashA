@@ -12,9 +12,11 @@ import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
@@ -45,7 +47,6 @@ import me.rosuh.filepicker.config.FilePickerManager
 import me.rosuh.filepicker.filetype.FileType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.json.JSONObject
 import java.io.File
 import java.io.IOException
 import java.net.URL
@@ -134,7 +135,7 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                     dialog.setCanBack(false)
                     dialog.setShowBackNav(false)
                     dialog.setPort(DataStore.portApi.toString())
-                    dialog.loadUrl("http://clash.razord.top/")
+                    dialog.loadUrl("http://yacd.haishan.me/index.html?port=${DataStore.portApi}#/proxies")
                     dialog.setOnDismissListener(saveInformationCallback)
                     dialog.show()
                     dialog.setMaxHeight(ScreenUtils.getScreenHeight())
@@ -145,7 +146,6 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
             true
         }
     }
-
 
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -159,10 +159,8 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                         dialog.setCanBack(false)
                         dialog.setShowBackNav(false)
                         dialog.setPort(DataStore.portApi.toString())
-                        dialog.loadUrl("http://127.0.0.1:8881/index.html")
-
+                        dialog.loadUrl("http://127.0.0.1:8881/index.html?port=${DataStore.portApi}#/proxies")
                         dialog.setOnDismissListener(saveInformationCallback)
-                        //dialog.loadUrl("http://clash.razord.top/")
                         dialog.show()
                         dialog.setMaxHeight(ScreenUtils.getScreenHeight())
                         dialog.setPeekHeight(ScreenUtils.getScreenHeight())
@@ -213,9 +211,6 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                     }
                 }
             }
-            7 -> {
-                throw RuntimeException("This is a crash")
-            }
         }
 
         return super.onOptionsItemSelected(item)
@@ -263,6 +258,7 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
         var progressDialog: ProgressDialog? = null
         var profileConfigId: Long? = null
         var updateCallback: ((config: ProfileConfig) -> Unit)? = null
+        var failCallback: (() -> Unit)? = null
 
         override fun onPreExecute() {
             super.onPreExecute()
@@ -275,7 +271,7 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
 
         override fun doInBackground(vararg params: Unit?): String {
             val mClient = OkHttpClient().newBuilder()
-                .connectTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(1, TimeUnit.SECONDS)
                 .readTimeout(12, TimeUnit.SECONDS)
                 .build()
             val request = Request.Builder()
@@ -287,7 +283,6 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
             return try {
                 mClient.newCall(request).execute().body()?.string().toString()
             } catch (e: Exception) {
-                ToastUtils.showShort(R.string.message_download_config_fail)
                 LogUtils.w(TAG, e)
                 Crashlytics.log(Log.ERROR, TAG, e.localizedMessage)
                 ""
@@ -299,29 +294,35 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
             super.onPostExecute(result)
             result?.let { it ->
                 try {
+                    if (!TextUtils.isEmpty(it)) {
+                        var config =
+                            if (profileConfigId != null) ConfigManager.getProfileConfig(profileConfigId!!) else null
 
-                    var config =
-                        if (profileConfigId != null) ConfigManager.getProfileConfig(profileConfigId!!) else null
+                        config = ProfileConfig.findProfileConfig(
+                            it,
+                            config,
+                            configName,
+                            url
+                        )
 
-                    config = ProfileConfig.findProfileConfig(
-                        it,
-                        config,
-                        configName,
-                        url
-                    )
+                        if (profileConfigId == null) {
+                            ConfigManager.createProfileConfig(config)
+                        } else {
+                            config.time = System.currentTimeMillis()
+                            ConfigManager.updateProfileConfig(config)
+                            updateCallback?.invoke(config)
+                        }
 
-                    if (profileConfigId == null) {
-                        ConfigManager.createProfileConfig(config)
-                    } else {
-                        config.time = System.currentTimeMillis()
-                        ConfigManager.updateProfileConfig(config)
-                        updateCallback?.invoke(config)
+                        ToastUtils.showLong(R.string.message_download_config_success)
+                    }else{
+                        failCallback?.invoke()
+                        ToastUtils.showLong(R.string.message_download_config_fail)
+                        Crashlytics.setString("Download debug result", result)
+
                     }
-
-                    ToastUtils.showLong(R.string.message_download_config_success)
-                    Crashlytics.log(Log.INFO, TAG, mContext?.getString(R.string.message_download_config_success))
                 } catch (e: Exception) {
-                    ToastUtils.showShort(R.string.message_download_config_fail)
+                    failCallback?.invoke()
+                    ToastUtils.showLong(R.string.message_download_config_fail)
                     Crashlytics.setString("Download debug result", result)
                 }
             }
@@ -404,6 +405,9 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                         updateCallback = {
                             itView.isEnabled = true
                             profileConfigsAdapter.refreshConfig(it)
+                        }
+                        failCallback = {
+                            itView.isEnabled = true
                         }
                     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
                 }
@@ -490,7 +494,7 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                 }).request()
         } else {
             FilePickerManager.from(this)
-                .maxSelectable(1)
+                .enableSingleChoice()
                 .fileType(object : AbstractFileType() {
                     private val allDefaultFileType: ArrayList<FileType> by lazy {
                         val fileTypes = ArrayList<FileType>()
