@@ -86,9 +86,6 @@ object DataStore {
     var portLocalDns: Int
         get() = getLocalPort(Key.portLocalDns, 5450)
         set(value) = publicStore.putString(Key.portLocalDns, value.toString())
-    var portTransproxy: Int
-        get() = getLocalPort(Key.portTransproxy, 8200)
-        set(value) = publicStore.putString(Key.portTransproxy, value.toString())
     var portHttpProxy: Int
         get() = getLocalPort(Key.portHttpProxy, 7890)
         set(value) = publicStore.putString(Key.portHttpProxy, value.toString())
@@ -99,7 +96,7 @@ object DataStore {
     var dnsConfig: String
         get() = publicStore.getString(
             Key.dnsConfig,
-            "{\"nameserver\":[\"tcp://114.115.240.175:9090\",\"tls://114.115.240.175:853\",\"tcp://47.101.136.37:9090\",\"tls://47.101.136.37:853\",\"tcp://119.29.107.85:9090\",\"tls://119.29.107.85:853\",\"tcp://118.24.208.197:9090\",\"tls://118.24.208.197:853\",\"tcp://139.196.72.143:53\",\"tcp://119.29.29.29:53\"],\"enhanced-mode\":\"redir-host\",\"fallback\":[\"tcp://1.0.0.1:53\",\"tcp://208.67.220.220:5353\",\"tls://1.0.0.1:853\"],\"enable\":true,\"ipv6\":false,\"listen\":\"0.0.0.0:5450\"}"
+            "{\"nameserver\":[\"223.5.5.5\",\"119.29.29.29\",\"https://ndns.233py.com/dns-query\",\"tls://dns.rubyfish.cn\"],\"enhanced-mode\":\"redir-host\",\"fallback\":[\"tls://1.0.0.1:853\",\"tls://1.1.1.1:853\",\"tls://8.8.8.8:853\"],\"enable\":true,\"ipv6\":false,\"listen\":\"0.0.0.0:5450\"}"
         )!!
         set(value) = publicStore.putString(Key.dnsConfig, value.toString())
 
@@ -109,17 +106,25 @@ object DataStore {
 
     var ipv6Enable: Boolean
         get() = publicStore.getBoolean(Key.ipv6, false)
-        set(value) = publicStore.putBoolean(Key.ipv6, false)
+        set(value) = publicStore.putBoolean(Key.ipv6, value)
+
+    var isBypassPrivateNetwork: Boolean
+        get() = publicStore.getBoolean(Key.KEY_BYPASS_PRIVATE_NETWORK, true)
+        set(value) = publicStore.putBoolean(Key.KEY_BYPASS_PRIVATE_NETWORK, value)
 
 
     /**
      * Initialize settings that have complicated default values.
      */
     fun initGlobal() {
+        if (publicStore.getBoolean("BypassPrivateNetworkInit", true)) {
+            publicStore.putBoolean("BypassPrivateNetworkInit", false)
+            isBypassPrivateNetwork = true
+        }
         if (publicStore.getString(Key.portProxy) == null) portProxy = portProxy
         if (publicStore.getString(Key.portLocalDns) == null) portLocalDns = portLocalDns
-        if (publicStore.getString(Key.portTransproxy) == null) portTransproxy = portTransproxy
         if (publicStore.getString(Key.portApi) == null) portApi = portApi
+        if (publicStore.getString(Key.portHttpProxy) == null) portHttpProxy = portHttpProxy
         if (publicStore.getString(Key.dnsConfig) == null) dnsConfig = dnsConfig
     }
 
