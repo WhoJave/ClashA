@@ -148,6 +148,7 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
     }
 
 
+
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item?.itemId) {
 
@@ -159,8 +160,10 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                         dialog.setCanBack(false)
                         dialog.setShowBackNav(false)
                         dialog.setPort(DataStore.portApi.toString())
-                        dialog.loadUrl("http://clash.razord.top/")
+                        dialog.loadUrl("http://127.0.0.1:8881/index.html")
+
                         dialog.setOnDismissListener(saveInformationCallback)
+                        //dialog.loadUrl("http://clash.razord.top/")
                         dialog.show()
                         dialog.setMaxHeight(ScreenUtils.getScreenHeight())
                         dialog.setPeekHeight(ScreenUtils.getScreenHeight())
@@ -271,7 +274,7 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
 
         override fun doInBackground(vararg params: Unit?): String {
             val mClient = OkHttpClient().newBuilder()
-                .connectTimeout(1, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(12, TimeUnit.SECONDS)
                 .build()
             val request = Request.Builder()
@@ -494,7 +497,7 @@ class ProfileListFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                 }).request()
         } else {
             FilePickerManager.from(this)
-                .enableSingleChoice()
+                .maxSelectable(1)
                 .fileType(object : AbstractFileType() {
                     private val allDefaultFileType: ArrayList<FileType> by lazy {
                         val fileTypes = ArrayList<FileType>()
