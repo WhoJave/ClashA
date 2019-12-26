@@ -113,9 +113,9 @@
         <item>255.255.255.254/32</item>
     </string-array>
 
-    com.github.cgg.clasha
+    com.github.cgg.clashar
 
     <string-array name="default_disallow_application">
-        <item>com.github.ccg.clasha</item>
+        <item>com.github.ccg.clashar</item>
     </string-array>
 </resources>
